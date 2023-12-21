@@ -4,6 +4,7 @@ import bodyParser from 'body-parser'
 import cors from 'cors'
 
 import passport from 'passport'
+import { creatDummyUsers } from './controllers/dummyController.js';
 
 dotenv.config()
 
@@ -17,10 +18,10 @@ app.use(cors())
 app.use(passport.initialize());
 
 import authentication from './routes/auth.js';
-import book from './routes/book.js';
+import appointment from './routes/appointment.js';
 
 app.use('/', authentication);
-app.use('/api', passport.authenticate('jwt', { session: false}), book);
+app.use('/api', passport.authenticate('jwt', { session: false}), appointment);
 
 
 
@@ -29,3 +30,5 @@ const port = process.env.PORT || 3001
 app.listen(port, () => {
   console.log(`Running on port ${port}`)
 })
+
+creatDummyUsers();

@@ -4,7 +4,7 @@ import Chance from 'chance';
 
 const chance = new Chance();
 const saltRounds = 10;
-await mycon.promise().query(`
+await mycon.query(`
     CREATE TABLE IF NOT EXISTS users (
         id INT AUTO_INCREMENT PRIMARY KEY,
         username VARCHAR(50) NOT NULL,
@@ -13,7 +13,7 @@ await mycon.promise().query(`
         role VARCHAR(100) NOT NULL
     )
 `);
-await mycon.promise().query(`
+await mycon.query(`
     CREATE TABLE IF NOT EXISTS patients (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
@@ -50,12 +50,12 @@ const generateRandomUsers = (count) => {
     return users;
 };
 
-const creatDummyUsers = async function (req, res) {
+const creatDummyUsers = async function () {
     try {
         const randomUsers = generateRandomUsers(30);
         let count = 0;
 
-        const existingUsers = await mycon.promise().query("SELECT * FROM users"); // Fetch all existing users
+        const existingUsers = await mycon.query("SELECT * FROM users"); // Fetch all existing users
 
         for (const user of randomUsers) {
             const userExists = existingUsers[0].some((existingUser) => existingUser.email === user.email);
@@ -69,9 +69,9 @@ const creatDummyUsers = async function (req, res) {
                     role: user.role,
                 };
 
-                const insertUser = await mycon.promise().query('INSERT INTO users SET ?', newUser);
+                const insertUser = await mycon.query('INSERT INTO users SET ?', newUser);
                 if (newUser.role == "patient" && insertUser != null) {
-                    const tempUsers = await mycon.promise().query("SELECT * FROM users WHERE email = '"+newUser.email+"'");
+                    const tempUsers = await mycon.query("SELECT * FROM users WHERE email = '"+newUser.email+"'");
                     console.log(tempUsers);
                     const newPatient = {
                         user_id: tempUsers[0][0].id,
@@ -80,18 +80,17 @@ const creatDummyUsers = async function (req, res) {
                         credit_card: user.credit_card,
                     };
 
-                    await mycon.promise().query('INSERT INTO patients SET ?', newPatient);
+                    await mycon.query('INSERT INTO patients SET ?', newPatient);
                     count++;
                 }
             }
         }
 
-        res.status(200).json({ info: `${count} users are created!` });
+        console.log( `${count} users are created!` );
     } catch (error) {
         console.error(error);
-        res.status(500).json({ error: 'Failed to generate users' });
     }
 };
 
 
-export default { creatDummyUsers }
+export   {creatDummyUsers} 
